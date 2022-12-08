@@ -48,6 +48,7 @@ type Config struct {
 	idleDownloadConfig idleDownloadConfig
 	systemSourceList   []string
 	nonUnknownList     []string
+	needDownloadSize   float64
 }
 
 func NewConfig(fpath string) *Config {
@@ -108,6 +109,7 @@ const (
 	dSettingsKeyIdleDownloadConfig                   = "idle-download-config"
 	dSettingsKeySystemSourceList                     = "system-sources"
 	dSettingsKeyNonUnknownList                       = "non-unknown-sources"
+	dSettingsKeyNeedDownloadSize                     = "need-download-size"
 )
 
 const configTimeLayout = "2006-01-02T15:04:05.999999999-07:00"
@@ -314,6 +316,12 @@ func getConfigFromDSettings() *Config {
 	for _, s := range v.Value().([]dbus.Variant) {
 		c.nonUnknownList = append(c.nonUnknownList, s.Value().(string))
 	}
+
+	v, err = c.dsLastoreManager.Value(0, dSettingsKeyNeedDownloadSize)
+	if err != nil {
+		logger.Warning(err)
+	}
+	c.needDownloadSize = v.Value().(float64)
 	return c
 }
 
@@ -468,6 +476,11 @@ func (c *Config) SetMirrorsUrl(mirrorsUrl string) error {
 func (c *Config) SetAllowInstallRemovePkgExecPaths(paths []string) error {
 	c.AllowInstallRemovePkgExecPaths = paths
 	return c.save(dSettingsKeyAllowInstallRemovePkgExecPaths, paths)
+}
+
+func (c *Config) SetNeedDownloadSize(size float64) error {
+	c.needDownloadSize = size
+	return c.save(dSettingsKeyNeedDownloadSize, size)
 }
 
 func (c *Config) save(key string, v interface{}) error {
