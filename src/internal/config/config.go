@@ -499,11 +499,7 @@ func getConfigFromDSettings() *Config {
 	} else {
 		url = v.Value().(string)
 	}
-	if len(url) == 0 {
-		c.PlatformUrl = "https://update-platform.uniontech.com"
-	} else {
-		c.PlatformUrl = url
-	}
+	c.PlatformUrl = url
 
 	v, err = c.dsLastoreManager.Value(0, dSettingsKeyPlatformRepoComponents)
 	if err != nil {

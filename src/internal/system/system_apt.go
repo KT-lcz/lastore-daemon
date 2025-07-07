@@ -358,16 +358,10 @@ func SystemArchitectures() ([]Architecture, error) {
 	return r, nil
 }
 
-var defaultRepoInfo = RepositoryInfo{
-	Name:   "desktop",
-	Url:    "http://packages.deepin.com/deepin",
-	Mirror: "http://cdn.packages.deepin.com/deepin",
-}
-
 func init() {
 	err := DecodeJson(path.Join(VarLibDir, "repository_info.json"), &RepoInfos)
 	if err != nil {
-		RepoInfos = []RepositoryInfo{defaultRepoInfo}
+		RepoInfos = []RepositoryInfo{}
 	}
 	_ = os.Setenv("DEBIAN_FRONTEND", "noninteractive")
 	_ = os.Setenv("DEBIAN_PRIORITY", "critical")
@@ -378,7 +372,7 @@ func init() {
 func DetectDefaultRepoInfo(rInfos []RepositoryInfo) RepositoryInfo {
 	f, err := os.Open("/etc/apt/sources.list")
 	if err != nil {
-		return defaultRepoInfo
+		return RepositoryInfo{}
 	}
 	defer func() {
 		_ = f.Close()
@@ -401,7 +395,7 @@ func DetectDefaultRepoInfo(rInfos []RepositoryInfo) RepositoryInfo {
 			}
 		}
 	}
-	return defaultRepoInfo
+	return RepositoryInfo{}
 }
 
 func guestBasePackageName(pkgId string) string {
